@@ -11,11 +11,13 @@ import {
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LinkIcon from "@mui/icons-material/Link";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { toast } from "sonner";
 
 const AdminUploadPanel: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [linkInput, setLinkInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
+  const [linkLoading, setLinkLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -24,7 +26,7 @@ const AdminUploadPanel: React.FC = () => {
   };
 
   const handleUpload = async () => {
-    setLoading(true);
+    setFileLoading(true);
     try {
       const formData = new FormData();
       files.forEach((file) => formData.append("files", file));
@@ -41,12 +43,12 @@ const AdminUploadPanel: React.FC = () => {
     } catch (err: any) {
       setErrorMsg(err.message);
     } finally {
-      setLoading(false);
+      setFileLoading(false);
     }
   };
 
   const handleLinkSubmit = async () => {
-    setLoading(true);
+    setLinkLoading(true);
     try {
       const res = await fetch("http://localhost:3001/api/weblinks", {
         method: "POST",
@@ -59,7 +61,7 @@ const AdminUploadPanel: React.FC = () => {
     } catch (err: any) {
       setErrorMsg(err.message);
     } finally {
-      setLoading(false);
+      setLinkLoading(false);
       setLinkInput("");
     }
   };
@@ -74,19 +76,22 @@ const AdminUploadPanel: React.FC = () => {
 
       if (!res.ok) throw new Error(data.error || "Reset failed");
 
-      // If using Snackbar or alert:
-      // enqueueSnackbar(data.message || "Knowledge base reset successfully.", {
-      //   variant: "success",
-      // });
+      toast.success(data.message || "Knowledge base reset successfully.");
     } catch (err) {
-      // enqueueSnackbar(err.message || "Something went wrong!", {
-      //   variant: "error",
-      // });
+      toast.error("Knowledge base cannot be reset");
     }
   };
 
   return (
-    <Box p={3} borderRadius={2} boxShadow={3} maxWidth={600} mx="auto">
+    <Box
+      m={5}
+      p={3}
+      maxWidth={600}
+      borderRadius={2}
+      boxShadow={3}
+      textAlign={"center"}
+      mx={"10%"}
+    >
       <Typography variant="h5" gutterBottom>
         Admin Upload Panel
       </Typography>
@@ -123,10 +128,10 @@ const AdminUploadPanel: React.FC = () => {
         <Button
           variant="contained"
           onClick={handleUpload}
-          disabled={files.length === 0 || loading}
+          disabled={files.length === 0 || fileLoading}
           fullWidth
         >
-          {loading ? <CircularProgress size={24} /> : "Submit Files"}
+          {fileLoading ? <CircularProgress size={24} /> : "Submit Files"}
         </Button>
       </Box>
 
@@ -142,9 +147,9 @@ const AdminUploadPanel: React.FC = () => {
           variant="contained"
           startIcon={<LinkIcon />}
           onClick={handleLinkSubmit}
-          disabled={!linkInput || loading}
+          disabled={!linkInput || linkLoading}
         >
-          {loading ? <CircularProgress size={20} /> : "Add"}
+          {linkLoading ? <CircularProgress size={20} /> : "Add"}
         </Button>
       </Box>
 
