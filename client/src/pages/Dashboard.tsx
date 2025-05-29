@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  Divider,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LinkIcon from "@mui/icons-material/Link";
@@ -83,91 +84,101 @@ const AdminUploadPanel: React.FC = () => {
   };
 
   return (
-    <Box
-      m={5}
-      p={3}
-      maxWidth={600}
-      borderRadius={2}
-      boxShadow={3}
-      textAlign={"center"}
-      mx={"10%"}
-    >
-      <Typography variant="h5" gutterBottom>
-        Admin Upload Panel
-      </Typography>
-
-      <Button
-        variant="outlined"
-        color="error"
-        startIcon={<RestartAltIcon />}
-        onClick={handleReset}
-        sx={{ mt: 2 }}
+    <Box display="flex" justifyContent="center" p={3}>
+      <Box
+        p={3}
+        maxWidth={600}
+        borderRadius={2}
+        boxShadow={3}
+        textAlign={"center"}
+        width="100%"
       >
-        Reset Knowledge Base
-      </Button>
-
-      <Box mt={2}>
-        <Button
-          component="label"
-          variant="contained"
-          startIcon={<CloudUploadIcon />}
-          fullWidth
-        >
-          Upload Files
-          <input hidden multiple type="file" onChange={handleFileChange} />
-        </Button>
-      </Box>
-
-      {files.length > 0 && (
-        <Typography variant="body2" mt={1}>
-          {files.length} file(s) selected
+        <Typography variant="h5" gutterBottom>
+          Admin Upload Panel
         </Typography>
-      )}
 
-      <Box mt={2}>
         <Button
-          variant="contained"
-          onClick={handleUpload}
-          disabled={files.length === 0 || fileLoading}
           fullWidth
-        >
-          {fileLoading ? <CircularProgress size={24} /> : "Submit Files"}
-        </Button>
-      </Box>
-
-      <Box mt={4} display="flex" alignItems="center">
-        <TextField
-          fullWidth
-          label="Enter Web Link"
-          value={linkInput}
-          onChange={(e) => setLinkInput(e.target.value)}
-        />
-        <Button
-          sx={{ ml: 2, height: "56px" }}
           variant="contained"
-          startIcon={<LinkIcon />}
-          onClick={handleLinkSubmit}
-          disabled={!linkInput || linkLoading}
+          color="error"
+          startIcon={<RestartAltIcon />}
+          onClick={handleReset}
+          sx={{ mt: 2 }}
         >
-          {linkLoading ? <CircularProgress size={20} /> : "Add"}
+          Reset Knowledge Base
         </Button>
+
+        <Divider sx={{ mt: 2 }} />
+
+        <Box mt={2}>
+          <Button
+            component="label"
+            variant="contained"
+            startIcon={<CloudUploadIcon />}
+            fullWidth
+          >
+            Upload Files
+            <input hidden multiple type="file" onChange={handleFileChange} />
+          </Button>
+        </Box>
+
+        {files.length > 0 && (
+          <Typography variant="body2" mt={1}>
+            {files.length} file(s) selected
+          </Typography>
+        )}
+
+        <Box mt={2}>
+          <Button
+            variant="contained"
+            onClick={handleUpload}
+            disabled={files.length === 0 || fileLoading}
+            fullWidth
+            color="success"
+          >
+            {fileLoading ? <CircularProgress size={24} /> : "Submit Files"}
+          </Button>
+        </Box>
+
+        <Divider sx={{ mt: 2 }} />
+
+        <Box mt={2} display="flex" alignItems="center">
+          <TextField
+            size="small"
+            fullWidth
+            label="Enter Web Link"
+            value={linkInput}
+            onChange={(e) => setLinkInput(e.target.value)}
+            type="url"
+          />
+          <Button
+            sx={{ ml: 2 }}
+            variant="contained"
+            startIcon={<LinkIcon />}
+            onClick={handleLinkSubmit}
+            disabled={!linkInput || linkLoading}
+            color="success"
+          >
+            {linkLoading ? <CircularProgress size={20} /> : "Add"}
+          </Button>
+        </Box>
+
+        <Snackbar
+          open={!!successMsg}
+          autoHideDuration={4000}
+          onClose={() => setSuccessMsg("")}
+        >
+          <Alert severity="success">{successMsg}</Alert>
+        </Snackbar>
+
+        <Snackbar
+          open={!!errorMsg}
+          autoHideDuration={4000}
+          onClose={() => setErrorMsg("")}
+        >
+          <Alert severity="error">{errorMsg}</Alert>
+        </Snackbar>
       </Box>
-
-      <Snackbar
-        open={!!successMsg}
-        autoHideDuration={4000}
-        onClose={() => setSuccessMsg("")}
-      >
-        <Alert severity="success">{successMsg}</Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={!!errorMsg}
-        autoHideDuration={4000}
-        onClose={() => setErrorMsg("")}
-      >
-        <Alert severity="error">{errorMsg}</Alert>
-      </Snackbar>
     </Box>
   );
 };
