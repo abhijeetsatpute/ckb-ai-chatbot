@@ -4,11 +4,16 @@ const multer = require("multer");
 const cors = require("cors");
 const { processFiles, processWebLinks, queryBot } = require("./services");
 const fs = require("fs");
+const path = require("path");
+
 const app = express();
 const upload = multer({ dest: "uploads/" });
 
 app.use(cors());
 app.use(express.json());
+
+// Serve React static files
+app.use(express.static(path.join(__dirname, "..", "client", "dist")));
 
 app.post("/api/reset", async (req, res) => {
   try {
@@ -51,4 +56,4 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log("Server running on http://localhost:3001"));
+app.listen(80, () => console.log("Server running on http://localhost:80"));

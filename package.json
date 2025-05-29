@@ -1,0 +1,14 @@
+{
+  "name": "ckb-ai-chatbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "deploy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:push": "node deploy.js",
+    "deploy:get": "powershell -Command \"(Invoke-WebRequest -UseBasicParsing 'https://registry.hub.docker.com/v2/repositories/abhijeet8991/ckb-ai-chatbot/tags?page_size=1' | ConvertFrom-Json).results[0].name\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -2,6 +2,8 @@ import "./App.css";
 import ChatWidget from "./components/ChatWidget";
 import AdminUploadPanel from "./pages/AdminUploadPanel";
 import { Toaster } from "sonner";
+import { VERSION } from "./utils/constants";
+import Version from "./components/Version";
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
       <AdminUploadPanel />
 
       <ChatWidget />
+
+      <Version version={VERSION} />
     </>
   );
 }

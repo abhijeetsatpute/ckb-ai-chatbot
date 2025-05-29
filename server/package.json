@@ -1,5 +1,6 @@
 {
   "name": "server",
+  "private": true,
   "version": "1.0.0",
   "description": "ckb-ai-chatbot server",
   "main": "index.js",
@@ -16,7 +17,6 @@
     "RAG"
   ],
   "author": "abhijeet satpute",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/abhijeetsatpute/ckb-ai-chatbot/issues"
   },

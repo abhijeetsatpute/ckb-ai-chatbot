@@ -32,7 +32,7 @@ const AdminUploadPanel: React.FC = () => {
     try {
       const formData = new FormData();
       files.forEach((file) => formData.append("files", file));
-      const res = await fetch("http://localhost:3001/api/upload", {
+      const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
@@ -57,7 +57,7 @@ const AdminUploadPanel: React.FC = () => {
 
     setLinkLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/api/weblinks", {
+      const res = await fetch("/api/weblinks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ links: [linkInput] }),
@@ -75,7 +75,7 @@ const AdminUploadPanel: React.FC = () => {
 
   const handleReset = async () => {
     try {
-      const res = await fetch("http://localhost:3001/api/reset", {
+      const res = await fetch("/api/reset", {
         method: "POST",
       });
 
