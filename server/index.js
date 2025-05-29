@@ -56,4 +56,4 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-app.listen(80, () => console.log("Server running on http://localhost:80"));
+app.listen(3000, () => console.log("Server running on 3000"));

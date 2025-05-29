@@ -24,6 +24,6 @@ COPY --from=client-builder /app/client/dist /app/client/dist
 # Set working directory to server
 WORKDIR /app/server
 
-EXPOSE 80
+EXPOSE 3000
 
 CMD ["node", "index.js"]
