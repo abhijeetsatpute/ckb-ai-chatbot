@@ -13,6 +13,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LinkIcon from "@mui/icons-material/Link";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { toast } from "sonner";
+import { isValidURL } from "../utils/validations";
 
 const AdminUploadPanel: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -49,6 +50,11 @@ const AdminUploadPanel: React.FC = () => {
   };
 
   const handleLinkSubmit = async () => {
+    if (!isValidURL(linkInput)) {
+      setErrorMsg("Please enter a valid URL.");
+      return;
+    }
+
     setLinkLoading(true);
     try {
       const res = await fetch("http://localhost:3001/api/weblinks", {
@@ -150,6 +156,10 @@ const AdminUploadPanel: React.FC = () => {
             value={linkInput}
             onChange={(e) => setLinkInput(e.target.value)}
             type="url"
+            error={!isValidURL(linkInput) && linkInput !== ""}
+            // helperText={
+            //   !isValidURL(linkInput) && linkInput !== "" ? "Invalid URL" : ""
+            // }
           />
           <Button
             sx={{ ml: 2 }}
