@@ -1,0 +1,39 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "ckb-ai-chatbot server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhijeetsatpute/ckb-ai-chatbot.git"
+  },
+  "keywords": [
+    "chatbot",
+    "ai",
+    "RAG"
+  ],
+  "author": "abhijeet satpute",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhijeetsatpute/ckb-ai-chatbot/issues"
+  },
+  "homepage": "https://github.com/abhijeetsatpute/ckb-ai-chatbot#readme",
+  "dependencies": {
+    "@langchain/community": "^0.3.45",
+    "@langchain/mistralai": "^0.2.0",
+    "axios": "^1.9.0",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "faiss-node": "^0.5.1",
+    "fs": "^0.0.1-security",
+    "langchain": "^0.3.27",
+    "mammoth": "^1.9.1",
+    "multer": "^2.0.0",
+    "pdf-parse": "^1.1.1"
+  }
+}
