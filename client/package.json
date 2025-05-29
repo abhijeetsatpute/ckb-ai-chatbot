@@ -1,7 +1,22 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.1",
+  "description": "ckb-ai-chatbot client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhijeetsatpute/ckb-ai-chatbot.git"
+  },
+  "keywords": [
+    "chatbot",
+    "ai",
+    "RAG"
+  ],
+  "author": "abhijeet satpute",
+  "bugs": {
+    "url": "https://github.com/abhijeetsatpute/ckb-ai-chatbot/issues"
+  },
+  "homepage": "https://github.com/abhijeetsatpute/ckb-ai-chatbot#readme",
   "type": "module",
   "scripts": {
     "dev": "vite",
