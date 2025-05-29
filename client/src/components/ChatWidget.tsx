@@ -23,11 +23,11 @@ interface Message {
 }
 
 const welcomeMessages = [
-  "👋 Hi there! I'm AskAbhi — ask me anything about my work, projects, or skills.",
-  "Namaste 🙏 I’m Abhijeet’s digital twin. Ask me anything about his journey!",
-  "👋 Hey! Curious about my experience, skills, or projects? I'm here to answer!",
-  "👋 Welcome! I'm AskAbhi — your personal guide to explore Abhijeet’s work.",
-  "👋 Hello! AskAbhi here — ready to chat about Abhijeet’s portfolio, anytime.",
+  "👋 Hi there! I'm askBot — feel free to ask me anything!",
+  "Namaste 🙏 I'm askBot — here to help with your questions!",
+  "👋 Hey! Got a question? I'm all ears — ask away!",
+  "👋 Welcome! I'm askBot — ready when you are!",
+  "👋 Hello! askBot here — let’s chat. Ask me anything!",
 ];
 
 const getRandomWelcome = () =>
