@@ -3,3 +3,4 @@ Dockerfile
 **/node_modules
 **/.env
 deploy.js
+wp-docker-compose.yml

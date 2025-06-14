@@ -2,9 +2,11 @@
 const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
-const { processFiles, processWebLinks, queryBot } = require("./services");
 const fs = require("fs");
 const path = require("path");
+
+const { processFiles, processWebLinks, queryBot } = require("./services");
+const { initStore, resetStore } = require("./db/vectorStoreManager");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -17,10 +19,7 @@ app.use(express.static(path.join(__dirname, "..", "client", "dist")));
 
 app.post("/api/reset", async (req, res) => {
   try {
-    if (fs.existsSync("./faiss-index")) {
-      fs.rmSync("./faiss-index", { recursive: true, force: true });
-    }
-    vectorStore = null;
+    await resetStore();
     res.json({ status: "reset", message: "Knowledge base has been cleared." });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -56,4 +55,7 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Server running on 3000"));
+app.listen(3000, async () => {
+  await initStore();
+  console.log("🚀 Server running on port 3000");
+});

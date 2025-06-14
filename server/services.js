@@ -2,56 +2,32 @@
 const fs = require("fs");
 const path = require("path");
 const pdfParse = require("pdf-parse");
-const axios = require("axios");
-const dotenv = require("dotenv");
 const cheerio = require("cheerio");
 const mammoth = require("mammoth");
+const dotenv = require("dotenv");
+const { chromium } = require("playwright");
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
 const { Document } = require("langchain/document");
-const { MistralAIEmbeddings } = require("@langchain/mistralai");
-const { ChatMistralAI } = require("@langchain/mistralai");
-const { FaissStore } = require("@langchain/community/vectorstores/faiss");
-const { chromium } = require("playwright");
-const FAISS_PATH = path.join(__dirname, "faiss-index");
+const { getStore } = require("./db/vectorStoreManager");
 
 dotenv.config();
-
-const embedder = new MistralAIEmbeddings({
-  apiKey: process.env.MISTRAL_API_KEY,
-});
-const chatModel = new ChatMistralAI({
-  apiKey: process.env.MISTRAL_API_KEY,
-});
-
-let vectorStore = null;
-
-// Load FAISS on server start
-(async () => {
-  if (fs.existsSync(FAISS_PATH)) {
-    vectorStore = await FaissStore.load(FAISS_PATH, embedder);
-    console.log("🔁 Loaded FAISS vector store");
-  }
-})();
 
 const indexDocuments = async (docs) => {
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1000,
     chunkOverlap: 200,
   });
+
   const splitDocs = await splitter.splitDocuments(docs);
+  const vectorStore = getStore();
+  await vectorStore.addDocuments(splitDocs);
 
-  if (vectorStore) {
-    await vectorStore.addDocuments(splitDocs); // 🔁 Append
-  } else {
-    vectorStore = await FaissStore.fromDocuments(splitDocs, embedder);
-  }
-
-  await vectorStore.save(FAISS_PATH);
   return { chunks: splitDocs.length };
 };
 
 const processFiles = async (files) => {
   const documents = [];
+
   for (const file of files) {
     const data = fs.readFileSync(file.path);
 
@@ -112,11 +88,14 @@ const processWebLinks = async (links) => {
 };
 
 const queryBot = async (question) => {
-  if (!vectorStore)
-    throw new Error("Knowledge base not ready. Upload files or links first.");
+  const vectorStore = getStore();
   const retriever = vectorStore.asRetriever();
   const docs = await retriever.getRelevantDocuments(question);
   const context = docs.map((doc) => doc.pageContent).join("\n---\n");
+
+  const { ChatMistralAI } = require("@langchain/mistralai");
+  const chatModel = new ChatMistralAI({ apiKey: process.env.MISTRAL_API_KEY });
+
   const res = await chatModel.invoke(
     `Answer the question based on context:\n${context}\n\nQ: ${question}`
   );
