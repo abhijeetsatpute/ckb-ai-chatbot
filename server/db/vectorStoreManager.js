@@ -1,9 +1,13 @@
-// vectorStoreManager.js
+// File: db/vectorStoreManager.js
 const { QdrantClient } = require("@qdrant/js-client-rest");
 const {
   QdrantVectorStore,
 } = require("@langchain/community/vectorstores/qdrant");
 const { MistralAIEmbeddings } = require("@langchain/mistralai");
+const {
+  clearAllDataSources,
+  initSourcesCollection,
+} = require("./dataSourceManager");
 require("dotenv").config();
 
 const client = new QdrantClient({ url: process.env.QDRANT_HOST });
@@ -11,7 +15,7 @@ const embedder = new MistralAIEmbeddings({
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
-const collectionName = process.env.COLLECTION_NAME;
+const collectionName = process.env.KB_COLLECTION_NAME;
 
 let vectorStore = null;
 
@@ -28,6 +32,9 @@ const initStore = async () => {
     client,
     collectionName,
   });
+
+  // Initialize sources collection
+  await initSourcesCollection();
 };
 
 const getStore = () => {
@@ -38,6 +45,31 @@ const getStore = () => {
 const resetStore = async () => {
   await client.deleteCollection(collectionName);
   await initStore();
+  // Clear all tracked data sources when resetting
+  await clearAllDataSources();
 };
 
-module.exports = { initStore, getStore, resetStore };
+// New function to delete documents by metadata filter
+const deleteDocumentsBySource = async (sourceId) => {
+  try {
+    // Delete documents with matching sourceId in metadata
+    await client.delete(collectionName, {
+      filter: {
+        must: [
+          {
+            key: "metadata.sourceId",
+            match: {
+              value: sourceId,
+            },
+          },
+        ],
+      },
+    });
+    return true;
+  } catch (error) {
+    console.error("Error deleting documents by source:", error);
+    throw error;
+  }
+};
+
+module.exports = { initStore, getStore, resetStore, deleteDocumentsBySource };
