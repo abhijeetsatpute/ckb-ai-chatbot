@@ -12,19 +12,26 @@ import {
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LinkIcon from "@mui/icons-material/Link";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import { toast } from "sonner";
 import { isValidURL } from "../utils/validations";
 
 const AdminUploadPanel: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [linkInput, setLinkInput] = useState("");
+  const [xmlFile, setXmlFile] = useState<File | null>(null);
   const [fileLoading, setFileLoading] = useState(false);
   const [linkLoading, setLinkLoading] = useState(false);
+  const [xmlLoading, setXmlLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFiles(Array.from(e.target.files));
+  };
+
+  const handleXMLFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) setXmlFile(e.target.files[0]);
   };
 
   const handleUpload = async () => {
@@ -70,6 +77,37 @@ const AdminUploadPanel: React.FC = () => {
     } finally {
       setLinkLoading(false);
       setLinkInput("");
+    }
+  };
+
+  const handleWordPressImport = async () => {
+    if (!xmlFile) {
+      setErrorMsg("Please select a WordPress XML file.");
+      return;
+    }
+
+    setXmlLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", xmlFile);
+
+      const res = await fetch("/api/wordpress-xml", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok)
+        setSuccessMsg(
+          `Imported ${data.result.chunks || "some"} WordPress entries.`
+        );
+      else throw new Error(data.error);
+    } catch (err: any) {
+      setErrorMsg(err.message);
+    } finally {
+      setXmlLoading(false);
+      setXmlFile(null);
     }
   };
 
@@ -170,6 +208,47 @@ const AdminUploadPanel: React.FC = () => {
             color="success"
           >
             {linkLoading ? <CircularProgress size={20} /> : "Add"}
+          </Button>
+        </Box>
+
+        <Divider sx={{ mt: 2 }} />
+
+        <Box mt={2}>
+          <Button
+            component="label"
+            variant="outlined"
+            startIcon={<FileUploadOutlinedIcon />}
+            fullWidth
+          >
+            Select WordPress XML
+            <input
+              hidden
+              type="file"
+              accept=".xml"
+              onChange={handleXMLFileChange}
+            />
+          </Button>
+        </Box>
+
+        {xmlFile && (
+          <Typography variant="body2" mt={1}>
+            {xmlFile.name}
+          </Typography>
+        )}
+
+        <Box mt={2}>
+          <Button
+            variant="contained"
+            onClick={handleWordPressImport}
+            fullWidth
+            disabled={!xmlFile || xmlLoading}
+            color="primary"
+          >
+            {xmlLoading ? (
+              <CircularProgress size={24} />
+            ) : (
+              "Import WordPress Data"
+            )}
           </Button>
         </Box>
 

@@ -32,11 +32,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-xml-bodyparser": "^0.3.0",
     "faiss-node": "^0.5.1",
     "fs": "^0.0.1-security",
     "langchain": "^0.3.27",
     "mammoth": "^1.9.1",
-    "multer": "^2.0.0",
-    "pdf-parse": "^1.1.1"
+    "multer": "^2.0.1",
+    "pdf-parse": "^1.1.1",
+    "xml2js": "^0.6.2"
   }
 }

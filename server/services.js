@@ -12,6 +12,8 @@ const { getStore } = require("./db/vectorStoreManager");
 
 dotenv.config();
 
+const BATCH_SIZE = 50;
+
 const indexDocuments = async (docs) => {
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: 1000,
@@ -20,7 +22,11 @@ const indexDocuments = async (docs) => {
 
   const splitDocs = await splitter.splitDocuments(docs);
   const vectorStore = getStore();
-  await vectorStore.addDocuments(splitDocs);
+
+  for (let i = 0; i < splitDocs.length; i += BATCH_SIZE) {
+    const batch = splitDocs.slice(i, i + BATCH_SIZE);
+    await vectorStore.addDocuments(batch);
+  }
 
   return { chunks: splitDocs.length };
 };
@@ -102,4 +108,29 @@ const queryBot = async (question) => {
   return res.content;
 };
 
-module.exports = { processFiles, processWebLinks, queryBot };
+const processWordPressXML = async (xmlBody) => {
+  const items = xmlBody?.rss?.channel?.item;
+  if (!items) throw new Error("Invalid XML structure");
+
+  const posts = Array.isArray(items) ? items : [items];
+
+  const documents = posts
+    .filter((post) => post["wp:post_type"] === "post")
+    .map((post) => {
+      const title = post.title || "Untitled";
+      const content = post["content:encoded"] || ""; // removed .slice(0, 5000)
+      return new Document({
+        pageContent: `${title}\n\n${content}`,
+        metadata: { source: post.link || "WordPress XML" },
+      });
+    });
+
+  return await indexDocuments(documents);
+};
+
+module.exports = {
+  processFiles,
+  processWebLinks,
+  queryBot,
+  processWordPressXML,
+};
