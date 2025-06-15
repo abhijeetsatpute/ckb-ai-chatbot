@@ -2,3 +2,4 @@
 **/node_modules
 **/faiss-index
 deploy.js
+**/uploads/
