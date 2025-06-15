@@ -11,15 +11,19 @@ import {
   useMediaQuery,
   useTheme,
   CircularProgress,
+  Chip,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import CloseIcon from "@mui/icons-material/Close";
+import LinkIcon from "@mui/icons-material/Link";
+import DescriptionIcon from "@mui/icons-material/Description";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
   content: string;
   role: "user" | "assistant";
+  sources?: string[];
 }
 
 const welcomeMessages = [
@@ -27,11 +31,42 @@ const welcomeMessages = [
   "Namaste 🙏 I'm askBot — here to help with your questions!",
   "👋 Hey! Got a question? I'm all ears — ask away!",
   "👋 Welcome! I'm askBot — ready when you are!",
-  "👋 Hello! askBot here — let’s chat. Ask me anything!",
+  "👋 Hello! askBot here — let's chat. Ask me anything!",
 ];
 
 const getRandomWelcome = () =>
   welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+
+const SourceChip = ({ source }: { source: string }) => {
+  const isUrl = source.startsWith("http");
+
+  return (
+    <Chip
+      size="small"
+      icon={
+        isUrl ? (
+          <LinkIcon fontSize="small" />
+        ) : (
+          <DescriptionIcon fontSize="small" />
+        )
+      }
+      label={isUrl ? new URL(source).hostname : source}
+      onClick={isUrl ? () => window.open(source, "_blank") : undefined}
+      sx={{
+        fontSize: "0.75rem",
+        height: "24px",
+        cursor: isUrl ? "pointer" : "default",
+        backgroundColor: "rgba(100, 181, 246, 0.1)",
+        color: "#64b5f6",
+        "&:hover": isUrl
+          ? {
+              backgroundColor: "rgba(100, 181, 246, 0.2)",
+            }
+          : {},
+      }}
+    />
+  );
+};
 
 const ChatWidget: React.FC = () => {
   const theme = useTheme();
@@ -87,8 +122,15 @@ const ChatWidget: React.FC = () => {
 
       if (!response.ok) throw new Error("Failed to get response");
 
-      const { answer } = await response.json();
-      setMessages((prev) => [...prev, { content: answer, role: "assistant" }]);
+      const { answer, sources } = await response.json();
+      setMessages((prev) => [
+        ...prev,
+        {
+          content: answer,
+          role: "assistant",
+          sources: sources || [],
+        },
+      ]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -210,51 +252,82 @@ const ChatWidget: React.FC = () => {
               }}
             >
               {messages.map((msg, i) => (
-                <Box
-                  key={i}
-                  display="flex"
-                  justifyContent={
-                    msg.role === "user" ? "flex-end" : "flex-start"
-                  }
-                  mb={2}
-                >
+                <Box key={i} mb={2}>
                   <Box
-                    px={2}
-                    py={1}
-                    borderRadius={2}
-                    maxWidth="90%"
-                    bgcolor={
-                      msg.role === "user"
-                        ? "rgba(195, 192, 180, 0.85)"
-                        : "grey.800"
+                    display="flex"
+                    justifyContent={
+                      msg.role === "user" ? "flex-end" : "flex-start"
                     }
-                    color={msg.role === "user" ? "#212121" : "grey.100"}
-                    sx={{ wordWrap: "break-word" }}
                   >
-                    {msg.role === "assistant" ? (
-                      <ReactMarkdown
-                        components={{
-                          a: ({ href, children }) => (
-                            <a
-                              href={href!}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{
-                                color: "#64b5f6",
-                                textDecoration: "underline",
-                              }}
-                            >
-                              {children}
-                            </a>
-                          ),
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
-                    ) : (
-                      msg.content
-                    )}
+                    <Box
+                      px={2}
+                      py={1}
+                      borderRadius={2}
+                      maxWidth="90%"
+                      bgcolor={
+                        msg.role === "user"
+                          ? "rgba(195, 192, 180, 0.85)"
+                          : "grey.800"
+                      }
+                      color={msg.role === "user" ? "#212121" : "grey.100"}
+                      sx={{ wordWrap: "break-word" }}
+                    >
+                      {msg.role === "assistant" ? (
+                        <ReactMarkdown
+                          components={{
+                            a: ({ href, children }) => (
+                              <a
+                                href={href!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  color: "#64b5f6",
+                                  textDecoration: "underline",
+                                }}
+                              >
+                                {children}
+                              </a>
+                            ),
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      ) : (
+                        msg.content
+                      )}
+                    </Box>
                   </Box>
+
+                  {/* Sources */}
+                  {msg.role === "assistant" &&
+                    msg.sources &&
+                    msg.sources.length > 0 && (
+                      <Box
+                        display="flex"
+                        justifyContent="flex-start"
+                        mt={1}
+                        px={1}
+                      >
+                        <Box maxWidth="90%">
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              mb: 0.5,
+                              display: "block",
+                              fontSize: "0.7rem",
+                            }}
+                          >
+                            Sources:
+                          </Typography>
+                          <Box display="flex" flexWrap="wrap" gap={0.5}>
+                            {msg.sources.map((source, idx) => (
+                              <SourceChip key={idx} source={source} />
+                            ))}
+                          </Box>
+                        </Box>
+                      </Box>
+                    )}
                 </Box>
               ))}
 

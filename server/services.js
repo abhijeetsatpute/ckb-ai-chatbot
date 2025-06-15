@@ -145,13 +145,22 @@ const queryBot = async (question) => {
   const docs = await retriever.getRelevantDocuments(question);
   const context = docs.map((doc) => doc.pageContent).join("\n---\n");
 
+  // Extract unique sources from the retrieved documents
+  const sources = [...new Set(docs.map((doc) => doc.metadata.source))];
+
   const { ChatMistralAI } = require("@langchain/mistralai");
   const chatModel = new ChatMistralAI({ apiKey: process.env.MISTRAL_API_KEY });
 
   const res = await chatModel.invoke(
     `Answer the question based on context:\n${context}\n\nQ: ${question}`
   );
-  return res.content;
+
+  // Return both answer and sources
+  return {
+    answer: res.content,
+    sources: sources,
+    context: context, // Optional: include context for debugging
+  };
 };
 
 const processWordPressXML = async (xmlBody) => {

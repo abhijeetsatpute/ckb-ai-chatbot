@@ -160,8 +160,11 @@ app.post("/api/weblinks", async (req, res) => {
 app.post("/api/chat", async (req, res) => {
   const { question } = req.body;
   try {
-    const answer = await queryBot(question);
-    res.json({ answer });
+    const result = await queryBot(question);
+    res.json({
+      answer: result.answer,
+      sources: result.sources,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
