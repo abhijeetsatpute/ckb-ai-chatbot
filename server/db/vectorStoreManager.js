@@ -31,6 +31,20 @@ const initStore = async () => {
     });
   }
 
+  // Create index for metadata.sourceId to enable filtering
+  try {
+    await client.createPayloadIndex(collectionName, {
+      field_name: "metadata.sourceId",
+      field_schema: "keyword", // Use 'keyword' for exact string matching
+    });
+    console.log("Index created for metadata.sourceId");
+  } catch (error) {
+    // Index might already exist, which is fine
+    if (!error.message?.includes("already exists")) {
+      console.warn("Warning creating index:", error.message);
+    }
+  }
+
   vectorStore = await QdrantVectorStore.fromExistingCollection(embedder, {
     client,
     collectionName,
@@ -52,7 +66,7 @@ const resetStore = async () => {
   await clearAllDataSources();
 };
 
-// New function to delete documents by metadata filter
+// Delete documents by metadata filter
 const deleteDocumentsBySource = async (sourceId) => {
   try {
     // Delete documents with matching sourceId in metadata
