@@ -10,7 +10,10 @@ const {
 } = require("./dataSourceManager");
 require("dotenv").config();
 
-const client = new QdrantClient({ url: process.env.QDRANT_HOST });
+const client = new QdrantClient({
+  url: process.env.QDRANT_HOST,
+  apiKey: process.env.QDRANT_API_KEY,
+});
 const embedder = new MistralAIEmbeddings({
   apiKey: process.env.MISTRAL_API_KEY,
 });

@@ -3,7 +3,10 @@ const { QdrantClient } = require("@qdrant/js-client-rest");
 const crypto = require("crypto");
 require("dotenv").config();
 
-const client = new QdrantClient({ url: process.env.QDRANT_HOST });
+const client = new QdrantClient({
+  url: process.env.QDRANT_HOST,
+  apiKey: process.env.QDRANT_API_KEY,
+});
 const SOURCES_COLLECTION =
   process.env.SOURCES_COLLECTION_NAME || "data_sources";
 
